@@ -51,4 +51,34 @@ def make_argparser():
 		help="the directory for intermediate files"
 	)
 
+	# GET_SAMPLE_NAME_MAP subcommand
+	get_sample_name_map.set_defaults(command="get_sample_name_map")
+	get_sample_name_map.add_argument(
+		"cohort_dir",
+		metavar="cohort_dir",
+		type=str,
+		help="the directory containing all samples belonging to the cohort"
+	)
+
+	get_sample_name_map.add_argument(
+		"--output",
+		type=str,
+		default="sample_name_map",
+		help="the name of the output file"
+	)
+
+	get_sample_name_map.add_argument(
+		"--append",
+		action="store_true",
+		help="append cohort to existing file"
+	)
+
+	get_sample_name_map.add_argument(
+		"--hdfs",
+		action="store_true",
+		help="cohort files are stored on the hdfs"
+	)
+
+	get_sample_name_map
+
 	return parser.parse_args()

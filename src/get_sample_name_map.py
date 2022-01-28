@@ -1,24 +1,40 @@
 import os
 
-# Get directory containing ONLY sample files
-sample_dir = input("Directory containing sample files: ")
-sample_dir = os.path.abspath(sample_dir)
+def get_sample_name_map(args):
 
-# Get number of samples to include
-num_samples = int(input("Number of samples to include: "))
+	# Get directory containing ONLY sample files
+	cohort_dir = os.path.abspath(args.cohort_dir)
 
-f = open("sample_name_map", "w")
+	# Check output filename
+	output_filename = "sample_name_map"
+	if args.output:
+		output_filename = args.output
 
-# Get a list of all the files in sample_dir
-filenames = os.listdir(sample_dir)
+	# Check for appending
+	writing_format = "w"
+	if args.append:
+		writing_format = "a"
 
-# Narrow it down to only tar.gz files
-count = 0
-for filename in filenames:
-	if ".tbi" not in filename and ".g.vcf.gz" in filename:
-		f.write("file://" + os.path.join(sample_dir,filename) + "\n")
-		
-		count += 1		
-		if count >= num_samples: # Break out when reaching num_samples
-			break
+	# Check for file location
+	prepend = "file://"
+	if args.hdfs == True:
+		prepend = "hdfs://"
+
+	# Write samples to output file
+	with open(output_filename, writing_format) as f:
+		# Get a list of all the files in sample_dir
+		samples = os.listdir(cohort_dir)
+
+		# Narrow it down to only tar.gz files
+		for sample in samples:
+			if ".tbi" not in sample and ".g.vcf.gz" in sample:
+				f.write(prepend + os.path.joint(cohort_dir, sample) + "\n")
+	# count = 0
+	# for filename in filenames:
+	# 	if ".tbi" not in filename and ".g.vcf.gz" in filename:
+	# 		f.write("file://" + os.path.join(sample_dir,filename) + "\n")
+			
+	# 		count += 1		
+	# 		if count >= num_samples: # Break out when reaching num_samples
+	# 			break
 		
