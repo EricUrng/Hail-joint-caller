@@ -28,7 +28,7 @@ def get_sample_name_map(args):
 		# Narrow it down to only tar.gz files
 		for sample in samples:
 			if ".tbi" not in sample and ".g.vcf.gz" in sample:
-				f.write(prepend + os.path.joint(cohort_dir, sample) + "\n")
+				f.write(prepend + os.path.join(cohort_dir, sample) + "\n")
 	# count = 0
 	# for filename in filenames:
 	# 	if ".tbi" not in filename and ".g.vcf.gz" in filename:

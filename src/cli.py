@@ -76,7 +76,7 @@ def make_argparser():
 	get_sample_name_map.add_argument(
 		"--hdfs",
 		action="store_true",
-		help="cohort files are stored on the hdfs"
+		help="sample files are stored on the hdfs"
 	)
 
 	get_sample_name_map
