@@ -34,12 +34,12 @@ def make_argparser():
 	)
 
 	joint_call.add_argument(
-		"output_dir",
-		metavar="output_dir",
+		"output",
+		metavar="output",
 		nargs="?",
 		default=os.getcwd(),
 		type=str,
-		help="the directory for the final output"
+		help="the destination for the final output"
 	)
 
 	joint_call.add_argument(

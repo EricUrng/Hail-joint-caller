@@ -6,10 +6,11 @@ def run_combiner(parser):
 	print("Running combiner...")
 
 	sample_name_map = os.path.abspath(parser.sample_name_map)
+	# Need to figure out a more eloquent way of getting hail_home
 	hail_home = '/home/eriurn/submit/python37_intel/lib/python3.7/site-packages/hail/' 
-	output_dir = os.path.abspath(parser.output_dir)
+	output = os.path.abspath(parser.output_dir)
 
-	temp_bucket = output_dir
+	temp_bucket = os.path.dirname(output)
 	if parser.tmp_dir:
 		temp_bucket = os.path.abspath(parser.tmp_dir)
 
@@ -29,6 +30,7 @@ def run_combiner(parser):
 
 		f.write(f"hl.experimental.run_combiner(inputs, output_file={output_file}, tmp_path={temp_bucket}, reference_genome='GRCh38', use_genome_default_intervals=True, overwrite=True)\n")
 
-	subprocess.run(f"spark-submit --archives ~/submit/pyspark_venv.tar.gz#python37_intel --jars {hail_home}/backend/hail-all-spark.jar {spark_submit_script}",shell=True)
+	# subprocess.run(f"spark-submit --archives ~/submit/pyspark_venv.tar.gz#python37_intel --jars {hail_home}/backend/hail-all-spark.jar {spark_submit_script}",shell=True)
+	subprocess.run(f"spark-submit --archives $PYTHON37_INTEL/pyspark_venv.tar.gz#python37_intel --jars $HAIL_HOME/backend/hail-all-spark.jar {spark_submit_script}",shell=True)
 	print("Completed running combiner...")
 
