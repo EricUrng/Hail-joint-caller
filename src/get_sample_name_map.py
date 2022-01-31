@@ -25,16 +25,14 @@ def get_sample_name_map(args):
 		# Get a list of all the files in sample_dir
 		samples = os.listdir(cohort_dir)
 
+		# Need to fix implementation of hdfs files
+		# if args.hdfs:	
+		# 	result = subprocess.run(f"hdfs dfs -ls {cohort_dir}",shell=True,stdout=subprocess.PIPE)
+		# 	samples = result.stdout
 		# Narrow it down to only tar.gz files
+
 		for sample in samples:
 			if ".tbi" not in sample and ".g.vcf.gz" in sample:
 				f.write(prepend + os.path.join(cohort_dir, sample) + "\n")
-	# count = 0
-	# for filename in filenames:
-	# 	if ".tbi" not in filename and ".g.vcf.gz" in filename:
-	# 		f.write("file://" + os.path.join(sample_dir,filename) + "\n")
-			
-	# 		count += 1		
-	# 		if count >= num_samples: # Break out when reaching num_samples
-	# 			break
+
 		
