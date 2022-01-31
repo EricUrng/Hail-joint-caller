@@ -16,7 +16,7 @@ def run_combiner(parser):
 
 		spark_submit_script.write("import hail as hl\n")
 		spark_submit_script.write("hl.init()\n")
-		spark_submit_script.write(f"temp_bucket={temp_bucket})\n")
+		spark_submit_script.write(f"temp_bucket={temp_bucket}\n")
 		spark_submit_script.write(f"output_file={output_dir}\n")
 		spark_submit_script.write(f"path_to_input_list={sample_name_map}\n")
 		spark_submit_script.write("inputs = []\n")
@@ -24,7 +24,8 @@ def run_combiner(parser):
 		spark_submit_script.write("    for line in f:\n") 
 		spark_submit_script.write("        inputs.append(line.strip())\n")
 
-		spark_submit_script.write("""hl.experimental.run_combiner(inputs, output_file=output_file, tmp_path=temp_bucket, reference_genome='GRCh38', use_genome_default_intervals=True, overwrite=True""")
+		spark_submit_script.write("hl.experimental.run_combiner(inputs, output_file=output_file, tmp_path=temp_bucket, reference_genome='GRCh38', use_genome_default_intervals=True, overwrite=True\n")
 
+	subprocess.run("spark-submit --archives pyspark_venv.tar.gz#python37_intel --jars $HAIL_HOME/backend/hail-all-spark.jar spark_submit_script.py",shell=True)
 	print("Completed running combiner...")
 
