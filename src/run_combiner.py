@@ -16,9 +16,9 @@ def run_combiner(parser):
 
 		spark_submit_script.write("import hail as hl\n")
 		spark_submit_script.write("hl.init()\n")
-		spark_submit_script.write(f"temp_bucket={temp_bucket}\n")
-		spark_submit_script.write(f"output_file={output_dir}\n")
-		spark_submit_script.write(f"path_to_input_list={sample_name_map}\n")
+		spark_submit_script.write(f"temp_bucket=file://{temp_bucket}\n")
+		spark_submit_script.write(f"output_file=file://{output_dir}\n")
+		spark_submit_script.write(f"path_to_input_list=file://{sample_name_map}\n")
 		spark_submit_script.write("inputs = []\n")
 		spark_submit_script.write("with hl.hadoop_open(path_to_input_list), 'r' as f:\n")
 		spark_submit_script.write("    for line in f:\n") 
