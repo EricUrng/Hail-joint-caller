@@ -8,7 +8,7 @@ def main():
 #	args = parse_args(parser)	
 
 	if parser.command == "joint_call":
-		print(run_combiner())
+		print(run_combiner(parser))
 	elif parser.command == "get_sample_name_map":
 		pass
 	elif parser.command == "complete_QC":
