@@ -5,26 +5,28 @@ def run_combiner(parser):
 
 	print("Running combiner...")
 
-	with open("spark_submit_script.py", "w") as spark_submit_script:
+	sample_name_map = os.path.abspath(parser.sample_name_map)
+	output_dir = os.path.abspath(parser.output_dir)
 
-		sample_name_map = os.path.abspath(parser.sample_name_map)
-		output_dir = os.path.abspath(parser.output_dir)
+	temp_bucket = output_dir
+	if parser.tmp_dir:
+		temp_bucket = os.path.abspath(parser.tmp_dir)
 
-		temp_bucket = output_dir
-		if parser.tmp_dir:
-			temp_bucket = os.path.abspath(parser.tmp_dir)
+	spark_submit_script = os.path.join(temp_bucket, "spark_submit_script.py")
 
-		spark_submit_script.write("import hail as hl\n")
-		spark_submit_script.write("hl.init()\n")
-		spark_submit_script.write(f"temp_bucket=file://{temp_bucket}\n")
-		spark_submit_script.write(f"output_file=file://{output_dir}\n")
-		spark_submit_script.write(f"path_to_input_list=file://{sample_name_map}\n")
-		spark_submit_script.write("inputs = []\n")
-		spark_submit_script.write("with hl.hadoop_open(path_to_input_list), 'r' as f:\n")
-		spark_submit_script.write("    for line in f:\n") 
-		spark_submit_script.write("        inputs.append(line.strip())\n")
+	with open(spark_submit_script, "w") as f:
 
-		spark_submit_script.write("hl.experimental.run_combiner(inputs, output_file=output_file, tmp_path=temp_bucket, reference_genome='GRCh38', use_genome_default_intervals=True, overwrite=True\n")
+		f.write("import hail as hl\n")
+		f.write("hl.init()\n")
+		f.write(f"temp_bucket=file://{temp_bucket}\n")
+		f.write(f"output_file=file://{output_dir}\n")
+		f.write(f"path_to_input_list=file://{sample_name_map}\n")
+		f.write("inputs = []\n")
+		f.write("with hl.hadoop_open(path_to_input_list), 'r' as f:\n")
+		f.write("    for line in f:\n") 
+		f.write("        inputs.append(line.strip())\n")
+
+		f.write("hl.experimental.run_combiner(inputs, output_file=output_file, tmp_path=temp_bucket, reference_genome='GRCh38', use_genome_default_intervals=True, overwrite=True\n")
 
 	subprocess.run("spark-submit --archives pyspark_venv.tar.gz#python37_intel --jars $HAIL_HOME/backend/hail-all-spark.jar spark_submit_script.py",shell=True)
 	print("Completed running combiner...")
