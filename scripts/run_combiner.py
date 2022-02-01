@@ -1,4 +1,4 @@
-import hail as hl
+# import hail as hl
 import argparse
 import os
 import logging
@@ -26,8 +26,8 @@ def make_argparser():
 	)
 	
 	parser.add_argument(
-		"temp-dir",
-		metavar="temp_dir",
+		"temp_dir",
+		metavar="temp-dir",
 		nargs="?",
 		default=os.getcwd(),
 		type=str,
@@ -38,6 +38,12 @@ def make_argparser():
 		"--hdfs",
 		action="store_true",
 		help="sample files are stored on the hdfs"
+	)
+
+	parser.add_argument(
+		"--overwrite",
+		action="store_true",
+		help="overwrite existing output file"
 	)
 	
 	parser.add_argument(
@@ -65,20 +71,31 @@ def main():
 	path_to_sample_map = os.path.abspath(parser.sample_map)
 
     # no provided output path or temp_dir, defaults to cwd
-	path_to_output = os.path.abspath(parser.output)	
-	#path_to_temp_dir = os.path.abspath(parser.temp_dir)
-	
-#	if hasattr(parser, "on_hdfs"):
-#		sample_prepend = "hdfs://"
-#	else:
-#		sample_prepend = "file://"
+	path_to_temp_dir = os.path.abspath(parser.temp_dir)
+
+	path_to_output = os.path.abspath(parser.output)
+	if path_to_output == os.getcwd():
+		path_to_output = os.path.join(path_to_output, "result.mt")
+
+	if hasattr(parser, "on_hdfs"):
+		sample_prepend = "hdfs://"
+	else:
+		sample_prepend = "file://"
 		
 	if parser.app_name:
 		app_name = parser.app_name
 	else:
-		app_name = ""
-		
+		app_name = "Hail"
+
+	if hasattr(parser, "overwrite"):
+		overwrite = True
+	else: 
+		overwrite = False	
+
+	print(path_to_output)
+
 	hl.init(
+		app_name = app_name,
 		log=path_to_output
 	)	
 	
@@ -92,8 +109,8 @@ def main():
 		out_file=path_to_output, 
 		tmp_path=path_to_output,
 		reference_genome=parser.reference,
-		use_genome_default_intervals=True,
-		overwrite=True
+		use_genome_default_intervals=True,	# implement option to choose another interval?
+		overwrite=overwrite
 	)
 
 	
