@@ -20,7 +20,7 @@ def run_combiner(parser):
 
 		f.write("import hail as hl\n")
 		f.write("hl.init()\n")
-		f.write(f"temp_bucket='file://{temp_bucket}'\n")
+		f.write(f"temp_bucket='file://{temp_bucket}'\n") # These are redundant if you're using f-strings at the bottom
 		f.write(f"output_file='file://{output}'\n")
 		f.write(f"path_to_input_list='file://{sample_name_map}'\n")
 		f.write("inputs = []\n")
