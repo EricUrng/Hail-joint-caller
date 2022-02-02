@@ -1,7 +1,7 @@
-# import hail as hl
+import hail as hl
 import argparse
 import os
-import logging
+import logging	# Need to implement this down the line
 
 def make_argparser():
 	
@@ -67,36 +67,40 @@ def make_argparser():
 def main():
 	parser = make_argparser()
 	
-	# must provide a sample_map
-	path_to_sample_map = os.path.abspath(parser.sample_map)
+	# Set name for the Hail application
+	if parser.app_name:
+		name = parser.app_name
+	else:
+		name = "Hail"
 
-    # no provided output path or temp_dir, defaults to cwd
-	path_to_temp_dir = os.path.abspath(parser.temp_dir)
+	# Set the location to prepending on location of files. Default is local.
+	# Should this even be an option?
+	if hasattr(parser, "on_hdfs"):
+		prepend_location = "hdfs://"
+	else:
+		prepend_location = "file://"
 
+	# Path to the sample map
+	path_to_sample_map = "file://" + os.path.abspath(parser.sample_map)
+
+	# Path to output destination
 	path_to_output = os.path.abspath(parser.output)
 	if path_to_output == os.getcwd():
-		path_to_output = os.path.join(path_to_output, "result.mt")
+		path_to_output = "file://" + os.path.join(path_to_output, "result.mt")	# Implement a timestamp into the name of the result file
+	else:
+		path_to_output = "file://" + path_to_output
 
-	if hasattr(parser, "on_hdfs"):
-		sample_prepend = "hdfs://"
-	else:
-		sample_prepend = "file://"
-		
-	if parser.app_name:
-		app_name = parser.app_name
-	else:
-		app_name = "Hail"
+    # Path to location for storing intermediate files
+	path_to_temp_dir = "file://" + os.path.abspath(parser.temp_dir)
 
 	if hasattr(parser, "overwrite"):
-		overwrite = True
+		overwrite_choice = True
 	else: 
-		overwrite = False	
-
-	print(path_to_output)
+		overwrite_choice = False	
 
 	hl.init(
-		app_name = app_name,
-		log=path_to_output
+		app_name = name,
+		log=os.getcwd()
 	)	
 	
 	inputs = []
@@ -107,13 +111,12 @@ def main():
 	hl.experimental.run_combiner(
 		inputs, 
 		out_file=path_to_output, 
-		tmp_path=path_to_output,
+		tmp_path=path_to_temp_dir,
 		reference_genome=parser.reference,
 		use_genome_default_intervals=True,	# implement option to choose another interval?
-		overwrite=overwrite
+		key_by_locus_and_alleles=True,		# This ensures the alleles row field isn't removed downstream
+		overwrite=overwrite_choice
 	)
-
-	
 
 if __name__ == "__main__":
 	main()
