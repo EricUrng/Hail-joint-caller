@@ -71,7 +71,7 @@ def main():
 	if parser.app_name:
 		name = parser.app_name
 	else:
-		name = "Hail"
+		name = "combine_gvcf"
 
 	# Set the location to prepending on location of files. Default is local.
 	# Should this even be an option?
@@ -115,7 +115,7 @@ def main():
 		reference_genome=parser.reference,
 		use_genome_default_intervals=True,	# implement option to choose another interval?
 		key_by_locus_and_alleles=True,		# This ensures the alleles row field isn't removed downstream
-		overwrite=overwrite_choice
+		overwrite=True
 	)
 
 if __name__ == "__main__":
