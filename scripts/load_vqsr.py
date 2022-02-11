@@ -1,7 +1,6 @@
-"""
-Combine a VQSR file and its input Hail matrix table.
-This has been heavily adapted from: https://github.com/populationgenomics/joint-calling
-"""
+#---------------------------------------------------#
+#             Combine VQSR file with MT             #
+#---------------------------------------------------#
 
 import hail as hl
 import os
