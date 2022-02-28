@@ -2,9 +2,10 @@
 #             Combine VQSR file with MT             #
 #---------------------------------------------------#
 
-import hail as hl
 import os
 import argparse
+import logging
+import hail as hl
 
 def make_argparser():
 
@@ -51,10 +52,10 @@ def make_argparser():
     return parser.parse_args()
 
 def main():
+    
     parser = make_argparser()
 
     # Check if file exists 
-    # THIS NEEDS check_if_exists FUNCTION TO BE IMPLEMENTED
     if hasattr(parser, "overwrite"):
         overwrite_choice = True
     else:
