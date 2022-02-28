@@ -2,9 +2,11 @@
 #             Combine VQSR file with MT             #
 #---------------------------------------------------#
 
+
 import os
 import argparse
 import logging
+from datetime import datetime
 import hail as hl
 
 def make_argparser():
@@ -52,24 +54,38 @@ def make_argparser():
     return parser.parse_args()
 
 def main():
-    
+
+	# Initialise logger
+	init_log(os.path.abspath(parser.output))
+
     parser = make_argparser()
 
-    # Check if file exists 
+	# Set name for the Hail application
+	if parser.app_name:
+		name = parser.app_name
+	else:
+		name = "load_vqsr"
+
+	# Prepend location according for files. Default is local.
+	if hasattr(parser, "on_hdfs"):
+		prepend_location = "hdfs://"
+	else:
+		prepend_location = "file://"
+
+	# Set choice for possibly overwriting output
     if hasattr(parser, "overwrite"):
         overwrite_choice = True
     else:
         overwrite_choice = False
 
-
     # Path variables 
-    path_to_mt = "file://" + os.path.abspath(parser.path_to_mt)
-    output_ht_path = "file://" + os.path.abspath(parser.output_ht_path)
+    path_to_mt = prepend_location + os.path.abspath(parser.path_to_mt)
+    output_ht_path = prepend_location + os.path.abspath(parser.output_ht_path)
 
     # Initialise Hail  
     hl.init(
         app_name=parser.app_name,
-        log=os.path.dirname(output_ht_path)
+        log=os.getcwd()
     )
 
     # Import the mt which was input for VQSR
@@ -107,6 +123,18 @@ def main():
 
     # Write ht to disk
     ht.write(output_ht_path, overwrite=overwrite_choice)
+
+def init_log(path_to_output):
+    now = datetime.now()
+    dt_string = now.strftime("%d_%m_%Y_%I_%M_%S_%p")
+    log_location = os.path.join(os.path.dirname(path_to_output), f"combine_gvcf_{dt_string}.log")
+
+    logging.basicConfig(
+        filename=log_location, 
+        format="%(asctime)s %(message)s", 
+        datefmt="%d/%m/%Y %I:%M:%S %p - ",
+        level=logging.INFO
+    )
 
 if __name__ == "__main__":
     main()
