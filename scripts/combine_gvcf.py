@@ -68,11 +68,11 @@ def make_argparser():
 	return parser.parse_args()
 
 def main():
+	parser = make_argparser()
 
 	# Initialise logger
 	init_log(os.path.abspath(parser.output))
 
-	parser = make_argparser()
 	
 	# Set name for the Hail application
 	if parser.app_name:
