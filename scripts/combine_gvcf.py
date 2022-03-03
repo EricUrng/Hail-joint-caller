@@ -1,7 +1,12 @@
-import hail as hl
+#---------------------------------------------------#
+#                 Joint-call GVCFs                  #
+#---------------------------------------------------#
+
 import argparse
 import os
-import logging	# Need to implement this down the line
+import logging
+from datetime import datetime
+import hail as hl
 
 def make_argparser():
 	
@@ -19,8 +24,6 @@ def make_argparser():
 	parser.add_argument(
 		"output",
 		metavar="output",
-		nargs="?",
-		default=os.getcwd(),
 		type=str,
 		help="path to the output file"
 	)
@@ -37,7 +40,7 @@ def make_argparser():
 	parser.add_argument(
 		"--hdfs",
 		action="store_true",
-		help="sample files are stored on the hdfs"
+		help="sample_name_map, output and temp directories are stored on the hdfs"
 	)
 
 	parser.add_argument(
@@ -66,57 +69,76 @@ def make_argparser():
 
 def main():
 	parser = make_argparser()
+
+	# Initialise logger
+	init_log(os.path.abspath(parser.output))
+
 	
 	# Set name for the Hail application
 	if parser.app_name:
 		name = parser.app_name
 	else:
-		name = "Hail"
+		name = "combine_gvcf"
 
-	# Set the location to prepending on location of files. Default is local.
-	# Should this even be an option?
+	# Prepend location according for files. Default is local.
 	if hasattr(parser, "on_hdfs"):
 		prepend_location = "hdfs://"
 	else:
 		prepend_location = "file://"
 
 	# Path to the sample map
-	path_to_sample_map = "file://" + os.path.abspath(parser.sample_map)
+	path_to_sample_map = prepend_location + os.path.abspath(parser.sample_map)
 
 	# Path to output destination
-	path_to_output = os.path.abspath(parser.output)
-	if path_to_output == os.getcwd():
-		path_to_output = "file://" + os.path.join(path_to_output, "result.mt")	# Implement a timestamp into the name of the result file
-	else:
-		path_to_output = "file://" + path_to_output
+	path_to_output = prepend_location + os.path.abspath(parser.output)
 
     # Path to location for storing intermediate files
-	path_to_temp_dir = "file://" + os.path.abspath(parser.temp_dir)
+	path_to_temp_dir = prepend_location + os.path.abspath(parser.temp_dir)
 
+	# Set choice for possibly overwriting output
 	if hasattr(parser, "overwrite"):
 		overwrite_choice = True
 	else: 
 		overwrite_choice = False	
 
+	logging.info(f"Initialising Hail")
 	hl.init(
 		app_name = name,
-		log=os.getcwd()
+		log=os.getcwd()		# This log location must be local
 	)	
 	
+	# Generate list of input files
 	inputs = []
 	with hl.hadoop_open(path_to_sample_map, "r") as f:
 		for line in f:
 			inputs.append(line.strip())
-			
+
+	logging.info(f"Combining {len(inputs)} GVCFs...")
+
+	# Run Hail's combiner
 	hl.experimental.run_combiner(
 		inputs, 
 		out_file=path_to_output, 
 		tmp_path=path_to_temp_dir,
 		reference_genome=parser.reference,
-		use_genome_default_intervals=True,	# implement option to choose another interval?
+		use_genome_default_intervals=True,	
 		key_by_locus_and_alleles=True,		# This ensures the alleles row field isn't removed downstream
 		overwrite=overwrite_choice
 	)
+
+	logging.info(f"Wrote combined GVCFs out to {path_to_output}")
+
+def init_log(path_to_output):
+    now = datetime.now()
+    dt_string = now.strftime("%d_%m_%Y_%I_%M_%S_%p")
+    log_location = os.path.join(os.path.dirname(path_to_output), f"combine_gvcf_{dt_string}.log")
+
+    logging.basicConfig(
+        filename=log_location, 
+        format="%(asctime)s %(message)s", 
+        datefmt="%d/%m/%Y %I:%M:%S %p - ",
+        level=logging.INFO
+    )
 
 if __name__ == "__main__":
 	main()
