@@ -2,10 +2,10 @@
 #                 Joint-call GVCFs                  #
 #---------------------------------------------------#
 
+from datetime import datetime
 import argparse
 import os
 import logging
-from datetime import datetime
 import hail as hl
 
 def make_argparser():
@@ -40,7 +40,7 @@ def make_argparser():
 	parser.add_argument(
 		"--hdfs",
 		action="store_true",
-		help="sample_name_map, output and temp directories are stored on the hdfs"
+		help="sample_name_map points to samples stored on the hdfs"
 	)
 
 	parser.add_argument(
@@ -73,18 +73,18 @@ def main():
 	# Initialise logger
 	init_log(os.path.abspath(parser.output))
 
-	
 	# Set name for the Hail application
 	if parser.app_name:
 		name = parser.app_name
 	else:
 		name = "combine_gvcf"
 
-	# Prepend location according for files. Default is local.
-	if hasattr(parser, "on_hdfs"):
-		prepend_location = "hdfs://"
-	else:
-		prepend_location = "file://"
+	# Prepend for where files are stored. Local is default.
+	prepend_location = "file://"
+	
+	sample_location = "file://"
+	if hasattr(parser, "hdfs"):
+		sample_location = "hdfs://"
 
 	# Path to the sample map
 	path_to_sample_map = prepend_location + os.path.abspath(parser.sample_map)
@@ -93,14 +93,13 @@ def main():
 	path_to_output = prepend_location + os.path.abspath(parser.output)
 
     # Path to location for storing intermediate files
-	path_to_temp_dir = prepend_location + os.path.abspath(parser.temp_dir)
+	path_to_temp_dir = prepend_location + os.path.abspath(parser.output)
 
 	# Set choice for possibly overwriting output
+	overwrite_choice = False
 	if hasattr(parser, "overwrite"):
 		overwrite_choice = True
-	else: 
-		overwrite_choice = False	
-
+			
 	logging.info(f"Initialising Hail")
 	hl.init(
 		app_name = name,
@@ -111,7 +110,7 @@ def main():
 	inputs = []
 	with hl.hadoop_open(path_to_sample_map, "r") as f:
 		for line in f:
-			inputs.append(line.strip())
+			inputs.append(sample_location + line.strip())
 
 	logging.info(f"Combining {len(inputs)} GVCFs...")
 
@@ -119,10 +118,10 @@ def main():
 	hl.experimental.run_combiner(
 		inputs, 
 		out_file=path_to_output, 
-		tmp_path=path_to_temp_dir,
+		tmp_path=path_to_output,
 		reference_genome=parser.reference,
 		use_genome_default_intervals=True,	
-		key_by_locus_and_alleles=True,		# This ensures the alleles row field isn't removed downstream
+		key_by_locus_and_alleles=True,		
 		overwrite=overwrite_choice
 	)
 
