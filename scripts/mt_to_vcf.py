@@ -1,9 +1,10 @@
-#---------------------------------------------------#
-#              Convert a MT into a VCF              #
-#---------------------------------------------------#
+#-------------------------------------------------------------#
+#              Convert a MT into a site-only VCF              #
+#-------------------------------------------------------------#
 
-import os
+from datetime import datetime
 import argparse
+import os
 import logging
 import hail as hl
 
@@ -24,7 +25,7 @@ def make_argparser():
 
     parser.add_argument(
         "output",
-        metavar="path_to_output",
+        metavar="output",
         type=str,
         help="path to the output file"
     )
@@ -38,32 +39,42 @@ def make_argparser():
     )
 
     parser.add_argument(
-        "--app-name",
+        "--app_name",
         metavar="app_name",
+        default="mt_to_vcf",
         type=str,
         help="name of the application"
     )
 
-	parser.add_argument(
-		"--hdfs",
-		action="store_true",
-		help="sample files are stored on the hdfs"
-	)
+    parser.add_argument(
+        "--hdfs",
+        action="store_true",
+        help="sample files are stored on the hdfs"
+    )
+
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="overwrite output file if it exists"
+    )
 
     return parser.parse_args()
 
 def main():
-
     parser = make_argparser()
 
     # Initialise logger
     init_log(os.path.abspath(parser.output))
 
-    # Prepend location according for files. Default is local.
-	if hasattr(parser, "on_hdfs"):
-		prepend_location = "hdfs://"
-	else:
-		prepend_location = "file://"
+	# Prepend for where files are stored. Local is default.
+    prepend_location = "file://"
+    if parser.hdfs == True:
+        prepend_location = "hdfs://"
+
+    # Set choice for overwriting output
+    overwrite_choice = False
+    if parser.overwrite == True:
+        overwrite_choice = True
 
     # Path to input mt
     path_to_mt = prepend_location + os.path.abspath(parser.path_to_mt)
@@ -71,19 +82,21 @@ def main():
     # Path to output VCF
     path_to_output = prepend_location + os.path.abspath(parser.output)
 
-	# Set name for the Hail application
-    if parser.app_name:
-        name = parser.app_name
-    else:
-        name = "mt_to_vcf"
+	# Check if output exists already in case of overwriting
+	if os.path.exists(path_to_output) and overwrite_choice == False:
+		logging.info(
+			f"Output file {path_to_output} exists, use --overwrite to overwrite"
+		)
+		return
 
     logging.info("Initialising Hail")
+
     hl.init(
-        app_name=name,
+        app_name=parser.app_name,
         log=os.getcwd()
     )
 
-	logging.info(f"Reading mt from {path_to_mt}")
+    logging.info(f"Reading mt from {path_to_mt}")
 
     # Read in mt to be converted
     mt = hl.read_matrix_table(path_to_mt)

@@ -50,11 +50,12 @@ def make_argparser():
 	)
 	
 	parser.add_argument(
-		"--app-name",
-		metavar="app_name",
-		type=str,
-		help="name of the application"
-	)
+        "--app_name",
+        metavar="app_name",
+        default="combine_gvcf",
+        type=str,
+        help="name of the application"
+    )
 	
 	parser.add_argument(
 		"--reference",
@@ -62,7 +63,6 @@ def make_argparser():
 		default="GRCh38",
 		type=str,
 		help="human genome reference to be used"
-	
 	)
 	
 	return parser.parse_args()
@@ -73,17 +73,11 @@ def main():
 	# Initialise logger
 	init_log(os.path.abspath(parser.output))
 
-	# Set name for the Hail application
-	if parser.app_name:
-		name = parser.app_name
-	else:
-		name = "combine_gvcf"
-
 	# Prepend for where files are stored. Local is default.
 	prepend_location = "file://"
 	
 	sample_location = "file://"
-	if hasattr(parser, "hdfs"):
+	if parser.hdfs == True:
 		sample_location = "hdfs://"
 
 	# Path to the sample map
@@ -92,17 +86,27 @@ def main():
 	# Path to output destination
 	path_to_output = prepend_location + os.path.abspath(parser.output)
 
-    # Path to location for storing intermediate files
-	path_to_temp_dir = prepend_location + os.path.abspath(parser.output)
-
 	# Set choice for possibly overwriting output
 	overwrite_choice = False
-	if hasattr(parser, "overwrite"):
+	if parser.overwrite == True:
 		overwrite_choice = True
-			
+
+	# Check if output exists already in case of overwriting
+	if os.path.exists(path_to_output) and overwrite_choice == False:
+		logging.info(
+			f"Output file {path_to_output} exists, use --overwrite to overwrite"
+		)
+		return
+
+    # Path to location for storing intermediate files
+	path_to_temp_dir = os.path.dirname(parser.output)
+	if parser.temp_dir:
+		path_to_temp_dir = parser.temp_dir
+
+
 	logging.info(f"Initialising Hail")
 	hl.init(
-		app_name = name,
+		app_name = parser.app_name,
 		log=os.getcwd()		# This log location must be local
 	)	
 	
@@ -118,7 +122,7 @@ def main():
 	hl.experimental.run_combiner(
 		inputs, 
 		out_file=path_to_output, 
-		tmp_path=path_to_output,
+		tmp_path=path_to_temp_dir,
 		reference_genome=parser.reference,
 		use_genome_default_intervals=True,	
 		key_by_locus_and_alleles=True,		

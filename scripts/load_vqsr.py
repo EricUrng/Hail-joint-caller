@@ -1,13 +1,14 @@
 #---------------------------------------------------#
-#             Combine VQSR file with MT             #
+#           Convert AS-VQSR file to a ht            #
 #---------------------------------------------------#
 
-
-import os
-import argparse
-import logging
 from datetime import datetime
+import argparse
+import os
+import logging
 import hail as hl
+
+from gnomad.utils.sparse_mt import split_info_annotation
 
 def make_argparser():
 
@@ -16,15 +17,15 @@ def make_argparser():
     )
 
     parser.add_argument(
-        "path_to_mt",
-        metavar="path_to_mt",
+        "path_to_vqsr",
+        metavar="path_to_vqsr",
         type=str,
-        help="path to the input matrix table"
+        help="path to the VQSR file of your mt"
     )
 	
     parser.add_argument(
-        "output_ht_path",
-        metavar="output_ht_path",
+        "output",
+        metavar="output",
         type=str,
         help="path to final output destination"
     )
@@ -51,46 +52,54 @@ def make_argparser():
         help="overwrite output file if it exists"
     )
 
+    parser.add_argument(
+        "--hdfs",
+        action="store_true",
+        help="files are stored on the hdfs"
+    )
+
     return parser.parse_args()
 
 def main():
-
-	# Initialise logger
-	init_log(os.path.abspath(parser.output))
-
     parser = make_argparser()
 
-	# Set name for the Hail application
-	if parser.app_name:
-		name = parser.app_name
-	else:
-		name = "load_vqsr"
+	# Initialise logger
+    init_log(os.path.abspath(parser.output))
 
 	# Prepend location according for files. Default is local.
-	if hasattr(parser, "on_hdfs"):
-		prepend_location = "hdfs://"
-	else:
-		prepend_location = "file://"
+    prepend_location = "file://"
+    if parser.hdfs == True:
+        prepend_location = "hdfs://"
 
-	# Set choice for possibly overwriting output
-    if hasattr(parser, "overwrite"):
+	# Set choice for overwriting output
+    overwrite_choice = False
+    if parser.overwrite == True:
         overwrite_choice = True
-    else:
-        overwrite_choice = False
 
-    # Path variables 
-    path_to_mt = prepend_location + os.path.abspath(parser.path_to_mt)
-    output_ht_path = prepend_location + os.path.abspath(parser.output_ht_path)
+    # Path to input mt
+    path_to_vqsr = prepend_location + os.path.abspath(parser.path_to_vqsr)
+    
+    # Path to output ht
+    path_to_output = prepend_location + os.path.abspath(parser.output)
+
+	# Check if output exists already in case of overwriting
+	if os.path.exists(path_to_output) and overwrite_choice == False:
+		logging.info(
+			f"Output file {path_to_output} exists, use --overwrite to overwrite"
+		)
+		return
 
     # Initialise Hail  
+	logging.info(f"Initialising Hail")
     hl.init(
         app_name=parser.app_name,
         log=os.getcwd()
     )
 
     # Import the mt which was input for VQSR
+	logging.info(f"Importing mt: {path_to_vqsr}")
     mt = hl.import_vcf(
-        path_to_mt,
+        path_to_vqsr,
         reference_genome=parser.reference,
         force_bgz=True
     )
@@ -98,6 +107,7 @@ def main():
     # ht will contain an info struct which is equal to the info struct of mt
     # but values from fields AS_VQSLOD and AS_SB_TABLE are remapped to
     # integers and floats
+    logging.info(f"Creating new info struct and remapping VQSR fields")
     ht = mt.rows()
     ht = ht.annotate(
         info=ht.info.annotate(
@@ -110,6 +120,8 @@ def main():
         ),
     )
    
+    logging.info(f"Splitting multi-allelic sites, filtering and annotating ht")
+
     # Split multiallelic variants 
     ht = hl.split_multi_hts(ht)
 
@@ -122,12 +134,13 @@ def main():
     )
 
     # Write ht to disk
-    ht.write(output_ht_path, overwrite=overwrite_choice)
+    logging.info(f"Writing ht to: {path_to_output}")
+    ht.write(path_to_output, overwrite=overwrite_choice)
 
 def init_log(path_to_output):
     now = datetime.now()
     dt_string = now.strftime("%d_%m_%Y_%I_%M_%S_%p")
-    log_location = os.path.join(os.path.dirname(path_to_output), f"combine_gvcf_{dt_string}.log")
+    log_location = os.path.join(os.path.dirname(path_to_output), f"load_vqsr{dt_string}.log")
 
     logging.basicConfig(
         filename=log_location, 
