@@ -92,17 +92,16 @@ def main():
 		overwrite_choice = True
 
 	# Check if output exists already in case of overwriting
-	if os.path.exists(path_to_output) and overwrite_choice == False:
-		logging.info(
-			f"Output file {path_to_output} exists, use --overwrite to overwrite"
-		)
-		return
+	# if os.path.exists(path_to_output) and overwrite_choice == False:
+	# 	logging.info(
+	# 		f"Output file {path_to_output} exists, use --overwrite to overwrite"
+	# 	)
+	# 	return
 
     # Path to location for storing intermediate files
-	path_to_temp_dir = os.path.dirname(parser.output)
+	path_to_temp_dir = os.path.dirname(path_to_output)
 	if parser.temp_dir:
-		path_to_temp_dir = parser.temp_dir
-
+		path_to_temp_dir = prepend_location + os.path.abspath(parser.temp_dir) 
 
 	logging.info(f"Initialising Hail")
 	hl.init(
