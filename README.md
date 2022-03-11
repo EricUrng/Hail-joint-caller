@@ -94,3 +94,5 @@ Notebooks have been written to demonstrate the inner workings of these scripts. 
 ## Acknowledgements
 This project could not have been completed without the guidance of Joe Copty, Shyamsundar Ravishankar and Arash Bayat. The work completed by Vlad Savelyev to incorporate VQSR was also immensely helpful.
 
+# Disclaimer
+This code is bug free and if any issues are almost definitely with the user. :smiley:
