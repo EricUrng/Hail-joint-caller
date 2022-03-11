@@ -4,7 +4,7 @@
 The code in this repository implements Hail and Apache Spark to solve the issues surrounding the traditional methods of joint-calling. The N+1 problem involves adding another sample to your cohort. Adding even a single sample requires you to re-call all samples from scratch again. This issue is compounded by the exponential scaling of computational time required as cohort size grows. Hail's new sparse matrix data format addresses this issue and enables the appending of existing joint-calls without re-processing, solving the N+1 problem.
 
 
-## Scripts available
+## Scripts Available
 Currently, processes are separated into their individual scripts. Each script can have its help message displayed by providing the "-h" flag.
 
 ### **combiner_gvcf.py**
@@ -95,4 +95,4 @@ Notebooks have been written to demonstrate the inner workings of these scripts. 
 This project could not have been completed without the guidance of Joe Copty, Shyamsundar Ravishankar and Arash Bayat. The work completed by Vlad Savelyev to incorporate VQSR was also immensely helpful.
 
 # Disclaimer
-This code is bug free and if any issues are almost definitely with the user. :smiley:
+:loudspeaker: This code is bug free and any issues are almost definitely with the user. :+1:
