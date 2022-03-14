@@ -22,7 +22,19 @@ VQSR must be run external from Hail but can imported otherwise. Begin with **mt_
 ### *VEP*
 Finally, you can run **VEP.py** to run VEP with any plugin on your mt. Note that the config files only work with a very specific format. Fields specified within your plugin line must case match what VEP expects. Also your vep_json_schema line must all be lowercase, excluding types.
 
-An installation of VEP has been placed at **/share/ClusterShare/software/contrib/eriurn**. 
+An installation of VEP has been placed at **/share/ClusterShare/software/contrib/eriurn**. However, you will need to install some dependencies. Firstly, it's easier if you install cpanm as a non-root user install other perl modules. Use the below:
+
+<pre><code>$ wget -O- http://cpanmin.us | perl - -l ~/perl5 App::cpanminus local::lib
+$ eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`
+$ echo 'eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`' >> ~/.profile
+$ echo 'export MANPATH=$HOME/perl5/man:$MANPATH' >> ~/.profile</code></pre>
+
+Now you need to install these modules:
+
+* [Bio::DB::HTS](http://www.htslib.org/download/)
+* [JSON](https://metacpan.org/pod/JSON)
+* [Set::IntervalTree](https://metacpan.org/pod/Set::IntervalTree)
+* [Bio::DB::BigFile](https://metacpan.org/pod/Bio::DB::BigFile)
 
 
 ## **Scripts Available**
