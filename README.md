@@ -84,8 +84,34 @@ optional arguments:
 
 
 ### **QC_methods.py**
+<pre><code>A tool for utilising Hail for QC.
+
+usage: QC_methods.py [-h] [--app_name app_name] [--hdfs] path_to_mt output
+
+positional arguments:
+  path_to_mt           path to the mt
+  output               path to the output file
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --app_name app_name  name of the application
+  --hdfs               files are stored on the hdfs</code></pre>
 
 ### **VEP.py**
+<pre><code>A tool for utilising VEP within Hail.
+
+usage: VEP.py [-h] [--app_name app_name] [--hdfs] path_to_mt output config
+
+positional arguments:
+  path_to_mt           path to the mt
+  output               path to the output file
+  config               path to the config file
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --app_name app_name  name of the application
+  --hdfs               files are stored on the hdfs</code></pre>
+
 
 ## Jupyter Notebooks
 Notebooks have been written to demonstrate the inner workings of these scripts. They can be found within the notebooks directory.
