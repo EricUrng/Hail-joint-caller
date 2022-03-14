@@ -10,6 +10,7 @@ The code in this repository implements Hail and Apache Spark to solve the issues
 ### *Preprocessing*
 It's a necessity that you run **reblockGVCF** and **VariantRecalibration** on your dataset prior to combining, otherwise VQSR will complain about the field QUALapprox being missing. 
 
+### *Joint-calling*
 With your preprocessed samples, you can put them through **combine_gvcf.py**. This script allows you to joint-call only a list of samples, a list of samples and existing Hail Matrix Tables (mts) and only existing mts. The output will be a sparse matrix table. This is Hail's new data format which allows you to simply append existing joint calls without re-processing, solving the N+1 problem. The sparse matrix table exploits the fact that GVCF files store information about the start of each reference block. These reference blocks are adjacent bases that are homozygous to the reference, spanning thousands to tens of thousands of bases. Hail achieves a lossless and less dense format by only storing the start and end positions of these reference blocks.
 
 ### *VQSR*
@@ -20,6 +21,8 @@ VQSR must be run external from Hail but can imported otherwise. Begin with **mt_
 
 ### *VEP*
 Finally, you can run **VEP.py** to run VEP with any plugin on your mt. Note that the config files only work with a very specific format. Fields specified within your plugin line must case match what VEP expects. Also your vep_json_schema line must all be lowercase, excluding types.
+
+An installation of VEP has been placed at **/share/ClusterShare/software/contrib/eriurn**. 
 
 
 ## **Scripts Available**
