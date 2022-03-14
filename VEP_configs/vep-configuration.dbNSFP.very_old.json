@@ -1,0 +1,19 @@
+{
+    "command": [
+        "/home/eriurn/ensembl-vep/vep",
+        "--format", "vcf",
+        "__OUTPUT_FORMAT_FLAG__",
+        "--everything",
+        "--allele_number",
+        "--no_stats",
+        "--cache", "--offline",
+        "--minimal",
+        "--assembly", "GRCh38",
+        "--plugin", "dbNSFP,/directflow/ClinicalGenomicsPipeline/dev/2021-02-04-PIPELINE-1885-All-Hail/vep/dbNSFP4.3a_grch38.gz,hg19_chr,input,aaref,aaalt,aapos,genename,Ancestral_allele,SIFT_pred,Polyphen2_HVAR_pred,CADD_phred,gnomAD_exomes_NFE_AF,gnomAD_exomes_POPMAX_AF,gnomAD_genomes_NFE_AF,gnomAD_genomes_POPMAX_AF,clinvar_hgvs,Interpro_domain,GTEx_V8_gene,GTEx_V8_tissue",
+        "-o", "STDOUT"
+    ],
+    "env": {
+        "PERL5LIB": "/home/eriurn/perl5/lib/perl5"
+    },
+    "vep_json_schema": "Struct{hg19_chr:String,input:String,aaref:String,aaalt:String,aapos:Int32,genename:String,Ancestral_allele:String,SIFT_pred:String,Polyphen2_HVAR_pred:String,CADD_phred:Float64,gnomAD_exomes_NFE_AF:Float64,gnomAD_exomes_POPMAX_AF:Float64,gnomAD_genomes_NFE_AF:Float64,gnomAD_genomes_POPMAX_AF:Float64,clinvar_hgvs:String,Interpro_domain:String,GTEx_V8_gene:String,GTEx_V8_tissue:String}"
+}

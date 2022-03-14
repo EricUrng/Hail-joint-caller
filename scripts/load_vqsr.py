@@ -83,21 +83,21 @@ def main():
     path_to_output = prepend_location + os.path.abspath(parser.output)
 
 	# Check if output exists already in case of overwriting
-	if os.path.exists(path_to_output) and overwrite_choice == False:
-		logging.info(
-			f"Output file {path_to_output} exists, use --overwrite to overwrite"
-		)
-		return
+	# if os.path.exists(path_to_output) and overwrite_choice == False:
+	# 	logging.info(
+	# 		f"Output file {path_to_output} exists, use --overwrite to overwrite"
+	# 	)
+	# 	return
 
     # Initialise Hail  
-	logging.info(f"Initialising Hail")
+    logging.info(f"Initialising Hail")
     hl.init(
         app_name=parser.app_name,
         log=os.getcwd()
     )
 
     # Import the mt which was input for VQSR
-	logging.info(f"Importing mt: {path_to_vqsr}")
+    logging.info(f"Importing mt: {path_to_vqsr}")
     mt = hl.import_vcf(
         path_to_vqsr,
         reference_genome=parser.reference,

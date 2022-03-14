@@ -1,0 +1,19 @@
+{
+    "command": [
+        "/home/eriurn/ensembl-vep/vep",
+        "--format", "vcf",
+        "-json",
+        "--no_stats",
+        "--force_overwrite",
+        "--cache", "--offline",
+        "--assembly", "GRCh38",
+        "--dir_plugins", "/home/eriurn/.vep/Plugins",
+        "--plugin", "dbNSFP,/directflow/ClinicalGenomicsPipeline/dev/2021-02-04-PIPELINE-1885-All-Hail/vep/dbNSFP4.3a_grch38.gz,Polyphen2_HVAR_score,gnomAD_exomes_NFE_AF,hg19_chr,CADD_phred,genename,Interpro_domain,gnomAD_genomes_POPMAX_AF,gnomAD_exomes_POPMAX_AF,aapos,aaref,clinvar_hgvs,SIFT_pred,gnomAD_genomes_NFE_AF,aaalt,Ancestral_allele,GTEx_V8_gene,GTEx_V8_tissue",
+        "-o", "STDOUT"
+    ],
+    "env": {
+        "PERL5LIB": "/home/eriurn/perl5/lib/perl5",
+        "PATH": "/home/eriurn/htslib_install_location/bin/:/home/eriurn/htslib_install_location/bin:/home/eriurn/perl5/bin:/home/eriurn/submit/python37_intel/bin:/opt/intel/oneapi/intelpython/latest/bin:/opt/intel/oneapi/intelpython/latest/bin:/home/eriurn/.vscode-server/bin/f80445acd5a3dadef24aa209168452a3d97cc326/bin/remote-cli:/home/eriurn/submit/python37_intel/bin:/opt/intel/oneapi/intelpython/latest/bin:/opt/intel/oneapi/intelpython/latest/bin:/opt/openmpi/bin:/usr/lib64/qt-3.3/bin:/home/eriurn/submit/python37_intel/bin:/opt/intel/oneapi/intelpython/latest/bin:/opt/intel/oneapi/intelpython/latest/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/ganglia/bin:/opt/ganglia/sbin:/usr/java/latest/bin:/opt/pdsh/bin:/opt/rocks/bin:/opt/rocks/sbin:/opt/gridengine/bin/lx-amd64:/opt/dell/srvadmin/bin"
+    },
+    "vep_json_schema": "Struct{transcript_consequences:Array[Struct{polyphen2_hvar_pred:String,gnomad_exomes_nfe_af:Float64,hg19_chr:Int32,cadd_phred:Float64,genename:String,interpro_domain:String,gnomad_genomes_popmax_af:Float64,gnomad_exomes_popmax_af:Float64,aapos:String,aaref:String,clinvar_hgvs:String,sift_pred:String,gnomad_genomes_nfe_af:Float64,aaalt:String,ancestral_allele:String,gtex_v8_gene:String,gtex_v8_tissue:String}],input:String}"
+}

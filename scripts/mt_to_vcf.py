@@ -83,11 +83,11 @@ def main():
     path_to_output = prepend_location + os.path.abspath(parser.output)
 
 	# Check if output exists already in case of overwriting
-	if os.path.exists(path_to_output) and overwrite_choice == False:
-		logging.info(
-			f"Output file {path_to_output} exists, use --overwrite to overwrite"
-		)
-		return
+	# if os.path.exists(path_to_output) and overwrite_choice == False:
+	# 	logging.info(
+	# 		f"Output file {path_to_output} exists, use --overwrite to overwrite"
+	# 	)
+	# 	return
 
     logging.info("Initialising Hail")
 

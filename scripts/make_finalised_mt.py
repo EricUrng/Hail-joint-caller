@@ -49,7 +49,7 @@ def make_argparser():
         help="files are stored on the hdfs"
     )
 
-	parser.add_argument(
+    parser.add_argument(
 		"--overwrite",
 		action="store_true",
 		help="overwrite existing output file"
