@@ -1,4 +1,4 @@
-# **Hail-joint-caller**
+# **The Hail Spark Pipeline (HSP)**
 
 ## **Traditional Methods**
 The code in this repository implements Hail and Apache Spark to solve the issues surrounding the traditional methods of joint-calling. The N+1 problem involves adding another sample to your cohort. Adding even a single sample requires you to re-call all samples from scratch again. This issue is compounded by the exponential scaling of computational time required as cohort size grows. Hail's new sparse matrix data format addresses this issue and enables the appending of existing joint-calls without re-processing, solving the N+1 problem.
@@ -45,7 +45,7 @@ export PATH=/share/ClusterShare/software/contrib/eriurn/htslib_install_location/
 <pre><code>spark-submit \
     --archives path/to/your/pyspark_venv.tar.gz#python37_intel \
     --jars $HAIL_HOME/backend/hail-all-spark.jar \
-    your_script.py
+    your_script.py arg1 arg2 ...
 </pre></code>
 
 ## **Scripts Available**
