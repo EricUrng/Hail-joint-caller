@@ -5,7 +5,7 @@ The code in this repository implements Hail and Apache Spark to solve the issues
 
 ## **Workflow**
 
-<img src="page.png" width="500" height="650">
+<img src="diagram.png" width="500" height="650">
 
 ### *Preprocessing*
 It's a necessity that you run **reblockGVCF** and **VariantRecalibration** on your dataset prior to combining, otherwise VQSR will complain about the field QUALapprox being missing. 
