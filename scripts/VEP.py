@@ -38,7 +38,7 @@ def make_argparser():
     parser.add_argument(
         "--app_name",
         metavar="app_name",
-        default="mt_to_vcf",
+        default="vep",
         type=str,
         help="name of the application"
     )
@@ -47,6 +47,12 @@ def make_argparser():
         "--hdfs",
         action="store_true",
         help="files are stored on the hdfs"
+    )
+
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="overwrite output file if it exists"
     )
 
     return parser.parse_args()
@@ -78,7 +84,7 @@ def main():
     
     hl.init(
         app_name=parser.app_name,
-        log=os.getcwd()
+        log=os.getcwd() + '/vep.log'
     ) 
 
     # Read in mt
@@ -95,7 +101,7 @@ def main():
     mt = hl.vep(mt, path_to_config)
 
     # Write mt to disk
-    mt.write(mt, overwrite=overwrite_choice)
+    mt.write(path_to_output, overwrite=overwrite_choice)
 
 def init_log(path_to_output):
     now = datetime.now()

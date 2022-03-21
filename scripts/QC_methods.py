@@ -31,7 +31,7 @@ def make_argparser():
     parser.add_argument(
         "--app_name",
         metavar="app_name",
-        default="mt_to_vcf",
+        default="qc_methods",
         type=str,
         help="name of the application"
     )
@@ -58,7 +58,7 @@ def main():
     # Initialise logger
     init_log(os.path.abspath(parser.output))
 
-	# Prepend for where files are stored. Local is default.
+    # Prepend for where files are stored. Local is default.
     prepend_location = "file://"
     if parser.hdfs == True:
         prepend_location = "hdfs://"
@@ -72,7 +72,7 @@ def main():
     logging.info("Initialising Hail")
     hl.init(
         app_name=parser.app_name,
-        log=os.getcwd()
+        log=os.getcwd() + '/log'
     )
 
     # Set choice for overwriting output
@@ -83,12 +83,12 @@ def main():
     # Read in mt
     mt = hl.read_matrix_table(path_to_mt)
 
-    # Split multiallelic sites
-    mt = hl.split_multi_hts(mt)    
-
     # Generate GT field if it's not present. This is needed for sample QC.
     if "GT" not in mt.entry and "LGT" in mt.entry and "LA" in mt.entry:
         mt = mt.transmute_entries(GT = hl.experimental.lgt_to_gt(mt.LGT, mt.LA))
+
+    # Split multiallelic sites
+    mt = hl.split_multi_hts(mt)
 
     # Run sample_qc, resulting field "sample_qc"
     mt = hl.sample_qc(mt, "sample_qc")
@@ -104,7 +104,7 @@ def main():
     logging.info("Completed impute_sex")
 
     # Adding the impute_sex fields to our original mt
-    mt = mt.annotate_cols(impute_sex = impute_sex[MT.s])
+    mt = mt.annotate_cols(impute_sex = impute_sex_mt[mt.s])
 
     # Write mt to disk
     mt.write(path_to_output, overwrite=overwrite_choice)
