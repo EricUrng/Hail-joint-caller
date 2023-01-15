@@ -56,23 +56,26 @@ def main():
     parser = make_argparser()
     
     # Initialise logger
-    init_log(os.path.abspath(parser.output))
+    # init_log(os.path.abspath(parser.output))
+    init_log()
 
     # Prepend for where files are stored. Local is default.
-    prepend_location = "file://"
-    if parser.hdfs == True:
-        prepend_location = "hdfs://"
+    # prepend_location = "file://"
+    # if parser.hdfs == True:
+    #     prepend_location = "hdfs://"
 
     # Path to input mt
-    path_to_mt = prepend_location + os.path.abspath(parser.path_to_mt)
+    # path_to_mt = prepend_location + os.path.abspath(parser.path_to_mt)
+    path_to_mt = parser.path_to_mt
 
     # Path to output mt
-    path_to_output = prepend_location + os.path.abspath(parser.output)
+    # path_to_output = prepend_location + os.path.abspath(parser.output)
+    path_to_output = parser.output
 
     logging.info("Initialising Hail")
     hl.init(
         app_name=parser.app_name,
-        log=os.getcwd() + '/log'
+        log=os.path.join(os.getcwd(), 'log')
     )
 
     # Set choice for overwriting output
@@ -111,10 +114,10 @@ def main():
 
     logging.info(f"Successfully wrote mt to {path_to_output}")
 
-def init_log(path_to_output):
+def init_log():
     now = datetime.now()
     dt_string = now.strftime("%d_%m_%Y_%I_%M_%S_%p")
-    log_location = os.path.join(os.path.dirname(path_to_output), f"QC_methods_{dt_string}.log")
+    log_location = os.path.join(os.path.dirname(os.path.realpath(__file__)), f"QC_methods_{dt_string}.log")
 
     logging.basicConfig(
         filename=log_location, 

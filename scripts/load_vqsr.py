@@ -64,12 +64,13 @@ def main():
     parser = make_argparser()
 
 	# Initialise logger
-    init_log(os.path.abspath(parser.output))
+    init_log()
+    # init_log(os.path.abspath(parser.output))
 
 	# Prepend location according for files. Default is local.
-    prepend_location = "file://"
-    if parser.hdfs == True:
-        prepend_location = "hdfs://"
+    # prepend_location = "file://"
+    # if parser.hdfs == True:
+     #    prepend_location = "hdfs://"
 
 	# Set choice for overwriting output
     overwrite_choice = False
@@ -77,10 +78,12 @@ def main():
         overwrite_choice = True
 
     # Path to input mt
-    path_to_vqsr = prepend_location + os.path.abspath(parser.path_to_vqsr)
-    
+    path_to_vqsr = parser.path_to_vqsr
+    # path_to_vqsr = prepend_location + os.path.abspath(parser.path_to_vqsr)
+
     # Path to output ht
-    path_to_output = prepend_location + os.path.abspath(parser.output)
+    path_to_output = parser.output
+    # path_to_output = prepend_location + os.path.abspath(parser.output)
 
 	# Check if output exists already in case of overwriting
 	# if os.path.exists(path_to_output) and overwrite_choice == False:
@@ -93,7 +96,7 @@ def main():
     logging.info(f"Initialising Hail")
     hl.init(
         app_name=parser.app_name,
-        log=os.getcwd()
+        log=os.path.join(os.getcwd(), 'log')
     )
 
     # Import the mt which was input for VQSR
@@ -137,10 +140,10 @@ def main():
     logging.info(f"Writing ht to: {path_to_output}")
     ht.write(path_to_output, overwrite=overwrite_choice)
 
-def init_log(path_to_output):
+def init_log():
     now = datetime.now()
     dt_string = now.strftime("%d_%m_%Y_%I_%M_%S_%p")
-    log_location = os.path.join(os.path.dirname(path_to_output), f"load_vqsr{dt_string}.log")
+    log_location = os.path.join(os.path.dirname(os.path.realpath(__file__)), f"load_vqsr{dt_string}.log")
 
     logging.basicConfig(
         filename=log_location, 

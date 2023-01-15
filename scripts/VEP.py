@@ -61,12 +61,12 @@ def main():
     parser = make_argparser()
 
     # Initialise logger
-    init_log(os.path.abspath(parser.output))
+    init_log()
 
 	# Prepend for where files are stored. Local is default.
-    prepend_location = "file://"
-    if parser.hdfs == True:
-        prepend_location = "hdfs://"
+    # prepend_location = "file://"
+    # if parser.hdfs == True:
+     #    prepend_location = "hdfs://"
 
     # Set choice for overwriting output
     overwrite_choice = False
@@ -74,17 +74,20 @@ def main():
         overwrite_choice = True
 
     # Path to input mt
-    path_to_mt = prepend_location + os.path.abspath(parser.path_to_mt)
+    path_to_mt = parser.path_to_mt
+    # path_to_mt = prepend_location + os.path.abspath(parser.path_to_mt)
 
     # Path to output mt
-    path_to_output = prepend_location + os.path.abspath(parser.output)
+    path_to_output = parser.output
+    # path_to_output = prepend_location + os.path.abspath(parser.output)
 
     # Path to config file
-    path_to_config = prepend_location + os.path.abspath(parser.config)
-    
+    path_to_config = parser.config
+    # path_to_config = prepend_location + os.path.abspath(parser.config)
+
     hl.init(
         app_name=parser.app_name,
-        log=os.getcwd() + '/vep.log'
+        log=os.path.join(os.getcwd(), 'vep.log')
     ) 
 
     # Read in mt
@@ -103,10 +106,10 @@ def main():
     # Write mt to disk
     mt.write(path_to_output, overwrite=overwrite_choice)
 
-def init_log(path_to_output):
+def init_log():
     now = datetime.now()
     dt_string = now.strftime("%d_%m_%Y_%I_%M_%S_%p")
-    log_location = os.path.join(os.path.dirname(path_to_output), f"VEP_{dt_string}.log")
+    log_location = os.path.join(os.path.dirname(os.path.realpath(__file__)), f"VEP_{dt_string}.log")
 
     logging.basicConfig(
         filename=log_location, 
